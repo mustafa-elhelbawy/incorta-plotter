@@ -8,12 +8,12 @@ export const getColumnsRequest = () => ({
     type: GET_COLUMNS_REQUEST,
 });
 
-export const getColumnsResponse = (data) => ({
+export const getColumnsResponse = (payload) => ({
     type: GET_COLUMNS_RESPONSE,
-    data
+    payload
 });
 
-export const getColumnsError = (data) => ({
+export const getColumnsError = (payload) => ({
     type: GET_COLUMNS_ERROR,
-    data
+    payload
 });

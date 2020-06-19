@@ -12,12 +12,12 @@ const columns = (state = INITIAL_STATE, action) => {
         case GET_COLUMNS_RESPONSE:
             return {
                 ...state,
-                list: action.data
+                list: action.payload
             }
         case GET_COLUMNS_ERROR:
             return {
                 ...state,
-                error: action.data
+                error: action.payload
             }
         default:
             return state;

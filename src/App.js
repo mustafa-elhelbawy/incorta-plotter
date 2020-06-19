@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from "react-redux";
 import { getColumnsRequest } from "./store/actions/columns";
-import logo from './logo.svg';
-import './App.css';
+import './App.scss';
+import Loader from "./components/loader/loader";
 
 class App extends React.Component {
   componentDidMount() {
@@ -10,22 +10,32 @@ class App extends React.Component {
   }
 
   render() {
+    const { loader, columnsList } = this.props;
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        {
+          loader &&
+          <Loader />
+        }
+        <div className="container-fluid">
+          <div className="row">
+            <aside className="col-4">
+              <h1>Incorta plotter</h1>
+              <ul>
+                {
+                  columnsList.map((col, i) => (
+                    <li key={`column_${i}`} className="h4">
+                      {col.name}
+                    </li>
+                  ))
+                }
+              </ul>
+            </aside>
+            <main className="col-8">
+              <h2>Chart here to be displayed</h2>
+            </main>
+          </div>
+        </div>
       </div>
     );
   }
@@ -33,7 +43,8 @@ class App extends React.Component {
 
 
 const mapStateToProps = (state) => ({
-  loader: state.loader
+  loader: state.loader,
+  columnsList: state.columns.list
 });
 const mapDispatchToProps = {
   getColumnsRequest
