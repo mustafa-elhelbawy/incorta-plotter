@@ -4,9 +4,11 @@ import { getColumnsRequest } from "./store/actions/columns";
 import { setDimension, clearDimension } from "./store/actions/dimension";
 import { setMeasure, clearMeasure } from "./store/actions/measure";
 import { getDataRequest, getDataResponse } from "./store/actions/data";
-import './App.scss';
 import Loader from "./components/loader/loader";
 import LineChart from "./components/charts/lineChart/lineChart";
+import DropArea from "./components/dropArea/dropArea";
+import Columns from "./components/columns/columns";
+import './App.scss';
 
 class App extends React.Component {
   constructor(props) {
@@ -78,93 +80,129 @@ class App extends React.Component {
     }
   }
 
-  render() {
+  renderColumns = (cols) => {
+    return(
+      (cols && cols.length > 0 ) ? 
+      <Columns 
+        attr={{
+          class: "text-left nav flex-column"
+        }}
+        list={cols}
+        item={{
+          class: "h6 nav-item",
+          prefix: "column_",
+          key: 'name',
+          attr: {
+            draggable: true
+          },
+          listeners:{
+            dragstart: this.drag
+          }
+        }}
+      /> :
+      <h6 className="text-muted">
+        No columns loaded yet...
+      </h6>
+    )
+  }
+
+  renderDropArea = (param, axis) => (
+    <DropArea
+      wrapperClass="col-12 d-flex justify-content-between align-items-center"
+      droppable={{
+        class: "dropArea d-flex align-items-center border border-dark w-100 m-2 p-2",
+        listeners: {
+          dragover: this.allowDrop,
+          drop: this.drop
+        }
+      }}
+      label={{
+        text: axis,
+        class: "h5"
+      }}
+      items={{
+        param,
+        function: axis,
+        key: 'name',
+        class: "badge badge-info p-2"
+      }}
+      actions={{
+        clear:{
+          text: 'Clear',
+          class:'btn btn-danger ml-auto',
+          click: this.clear
+        }
+      }}
+    />
+  )
+    
+  renderLineChart = () => {
     const { feeds } = this.state;
+    return(
+      (feeds && feeds.length > 0) ?
+      <LineChart
+        data={{
+          xAxis: feeds[0],
+          yAxis: feeds[1]
+        }}
+        title={feeds[0].name}
+        color="#3E517A"
+      /> :
+      <div className="w-75 my-5">
+        <h2 className="my-5">
+          Please, select parameters!
+        </h2>
+        <small className="text-muted">
+          - Dimension could be (Product, Year or Country) <br/>
+          - Measure could be (Cost, Revenu or Unit Slots).
+        </small>
+      </div>
+    )
+  }
+
+  render() {
     const { loader, columnsList, dimension, measure } = this.props;
     return (
       <div className="App">
-        {
-          loader &&
-          <Loader />
-        }
-        <div className="container-fluid">
-          <div className="row text-center">
-            <aside className="col-4">
-              <h1>Incorta plotter</h1>
-              <ul className="text-left">
-                {
-                  columnsList.map((col, i) => (
-                    <li key={`column_${i}`} className="h4"
-                    id={`column_${i}`} data-function={{}}
-                    draggable="true" 
-                    onDragStart={(event) => this.drag(event, JSON.stringify(col))}>
-                      {col.name}
-                    </li>
-                  ))
-                }
-              </ul>
-            </aside>
-            <main className="col-8 text-center">
-              <h2>Chart here to be displayed</h2>
-              <div className="row dropAreasWrapper">
-                <div className="col-12 d-flex justify-content-between align-items-center">
-                  <label className="">Dimension</label>
-                  <div data-allowed="dimension" 
-                  className="dropArea d-flex align-items-center border border-dark w-100 m-2 p-2"
-                  onDragOver={this.allowDrop} onDrop={this.drop}>
-                    {
-                      dimension && 
-                      <span className="badge badge-info p-2">
-                        {dimension.name}
-                      </span>
-                    }
-                  </div>
-                  <button onClick={(event) => this.clear(event, 'dimension')}
-                  className="btn btn-danger btn-sm ml-auto">
-                    Clear
-                  </button>
+        {loader && <Loader />}
+        <div className="container-fluid p-0">
+          <nav className="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+            <h2 className="navbar-brand col-md-3 col-lg-2 m-0 px-3">
+              Incorta Plotter
+            </h2>
+            <button className="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+              <span className="navbar-toggler-icon"></span>
+            </button>
+          </nav>
+
+          <div className="container-fluid">
+            <div className="row">
+              <nav id="sidebarMenu" 
+              className="col-md-3 col-lg-2 d-md-block px-4 bg-light sidebar collapse">
+                <h5 className="my-3">Columns List</h5>
+                <div className="sidebar-sticky pt-3">
+                  {this.renderColumns(columnsList)}
                 </div>
-                <div className="col-12 d-flex justify-content-between align-items-center">
-                  <label className="">Measures</label>
-                  <div data-allowed="measure" 
-                  className="dropArea d-flex align-items-center border border-dark w-100 m-2 p-2"
-                  onDragOver={this.allowDrop} onDrop={this.drop}>
-                    {
-                      measure && 
-                      <span className="badge badge-info p-2">
-                        {measure.name}
-                      </span>
-                    }
-                  </div>
-                  <button onClick={(event) => this.clear(event, 'measure')}
-                  className="btn btn-danger btn-sm ml-auto">
-                    Clear
-                  </button>
+              </nav>
+
+              <main className="col-md-9 ml-sm-auto col-lg-10 px-md-4 text-center">
+                <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                  <h1 className="h2">Dashboard</h1>
+                  <br/>
                 </div>
-              </div>
-              <div className="w-75 m-auto">
-                {
-                  (feeds && feeds.length > 0) ?
-                  <LineChart
-                    data={{
-                      xAxis: this.state.feeds[0],
-                      yAxis: this.state.feeds[1]
-                    }}
-                    title={this.state.feeds[0].name}
-                    color="#3E517A"
-                  /> :
-                  <div className="w-75 my-5">
-                    <h2 className="my-5">
-                      No Dimension or Measure has been selected yet
-                    </h2>
-                    <small className="text-muted">
-                      Dimension could be (Product, Year or Country) &
-                      Measure could be (Cost, Revenu or Unit Slots)
-                    </small>
-                  </div>
-                }
-              </div>
-            </main>
+                <div class="alert alert-warning alert-dismissible h6" role="alert">
+                  <strong>Hello! </strong> 
+                  You should drag items from the left sidebar into the Dimension & Measure areas to start chart data
+                </div>
+                <div className="row dropAreasWrapper">
+                  {this.renderDropArea(dimension, 'dimension')}
+                  {this.renderDropArea(measure, 'measure')}
+                </div>
+                <div className="w-75 m-auto">
+                  {this.renderLineChart()}
+                </div>
+              </main>
+            </div>
           </div>
         </div>
       </div>
