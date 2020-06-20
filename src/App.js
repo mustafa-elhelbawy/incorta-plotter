@@ -30,7 +30,6 @@ class App extends React.Component {
     const { dimension:dimensionProp, measure:measureProp } = this.props;
     if (dimensionPrevProp?.name !== dimensionProp?.name || 
       measurePrevProp?.name !== measureProp?.name) {
-      debugger
       if(dimensionProp && measureProp) {
         this.props.getDataRequest({
           "dimension": `${dimensionProp.name}`,
@@ -60,8 +59,6 @@ class App extends React.Component {
     const data = JSON.parse(event.dataTransfer.getData("chartData"));
     this.setState({
       [data.function]: data.name
-    }, () => {
-      console.log(this.state)
     });
 
     if(data.function === 'dimension') {
@@ -190,7 +187,7 @@ class App extends React.Component {
                   <h1 className="h2">Dashboard</h1>
                   <br/>
                 </div>
-                <div class="alert alert-warning alert-dismissible h6" role="alert">
+                <div className="alert alert-warning alert-dismissible h6" role="alert">
                   <strong>Hello! </strong> 
                   You should drag items from the left sidebar into the Dimension & Measure areas to start chart data
                 </div>

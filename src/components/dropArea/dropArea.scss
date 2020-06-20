@@ -6,4 +6,9 @@
 .dropArea {
     min-height: 40px;
     max-height: 40px;
+
+    span {
+        display: inline-block;
+        min-width: 8em;
+    }
 }
