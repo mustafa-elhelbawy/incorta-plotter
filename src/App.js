@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from "react-redux";
 import { getColumnsRequest } from "./store/actions/columns";
+import { setDimension, clearDimension } from "./store/actions/dimension";
+import { setMeasure, clearMeasure } from "./store/actions/measure";
 import './App.scss';
 import Loader from "./components/loader/loader";
 import LineChart from "./components/charts/lineChart/lineChart";
@@ -16,6 +18,8 @@ class App extends React.Component {
     // console.log(this.getFeeds());
 
     this.state = {
+      dimension: null,
+      measure: null,
       feeds: [
         {
           "name": "Product",
@@ -105,23 +109,39 @@ class App extends React.Component {
     return feeds;
   }
   
-  allowDrop(event) {
+  allowDrop = (event) => {
     event.preventDefault();
   }
 
-  drag(event, item) {
+  drag = (event, item) => {
     event.dataTransfer.setData("chartData", item);
   }
 
-  drop(event) {
+  drop = (event) => {
     event.preventDefault();
     const data = JSON.parse(event.dataTransfer.getData("chartData"));
     console.log(data);
-    // event.target.appendChild(document.getElementById(data));
+
+    // this.setState({
+    //   [data.function]: data.name
+    // });
+    if(data.function === 'dimension') {
+      this.props.setDimension(data);
+    } else {
+      this.props.setMeasure(data);
+    }
+  }
+
+  clear = (event, area) => {
+    if(area === 'dimension') {
+      this.props.clearDimension();
+    } else {
+      this.props.clearMeasure();
+    }
   }
 
   render() {
-    const { loader, columnsList } = this.props;
+    const { loader, columnsList, dimension, measure } = this.props;
     return (
       <div className="App">
         {
@@ -137,22 +157,43 @@ class App extends React.Component {
                   columnsList.map((col, i) => (
                     <li key={`column_${i}`} className="h4"
                     id={`column_${i}`} data-function={{}}
-                    draggable="true" onDragStart={(event) => this.drag(event, JSON.stringify(col))}>
+                    draggable="true" 
+                    onDragStart={(event) => this.drag(event, JSON.stringify(col))}>
                       {col.name}
                     </li>
                   ))
                 }
               </ul>
             </aside>
-            <main className="col-8">
+            <main className="col-8 text-center">
               <h2>Chart here to be displayed</h2>
-              <div data-allowed="dimension" className="dropArea border border-dark w-75 my-2"
+              <div data-allowed="dimension" 
+              className="dropArea d-flex align-items-center border border-dark w-75 mx-auto my-2 p-2"
               onDragOver={this.allowDrop} onDrop={this.drop}>
-
+                {
+                  dimension && 
+                  <span className="badge badge-info p-2">
+                    {dimension.name}
+                  </span>
+                }
+                <button onClick={(event) => this.clear(event, 'dimension')}
+                className="btn btn-danger btn-sm ml-auto">
+                  Clear
+                </button>
               </div>
-              <div data-allowed="measure" className="dropArea border border-dark w-75 my-2"
+              <div data-allowed="measure" 
+              className="dropArea d-flex align-items-center border border-dark w-75 mx-auto my-2 p-2"
               onDragOver={this.allowDrop} onDrop={this.drop}>
-
+                {
+                  measure && 
+                  <span className="badge badge-info p-2">
+                    {measure.name}
+                  </span>
+                }
+                <button onClick={(event) => this.clear(event, 'measure')}
+                className="btn btn-danger btn-sm ml-auto">
+                  Clear
+                </button>
               </div>
               <div className="w-75 m-auto">
                 <LineChart
@@ -175,10 +216,16 @@ class App extends React.Component {
 
 const mapStateToProps = (state) => ({
   loader: state.loader,
-  columnsList: state.columns.list
+  columnsList: state.columns.list,
+  dimension: state.dimension.column,
+  measure: state.measure.column
 });
 const mapDispatchToProps = {
-  getColumnsRequest
+  getColumnsRequest,
+  setDimension,
+  clearDimension,
+  setMeasure,
+  clearMeasure
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
