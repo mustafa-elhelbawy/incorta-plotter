@@ -1,0 +1,14 @@
+.dropAreaLabel {
+    min-width: 15%;
+    text-transform: capitalize;
+}
+
+.dropArea {
+    min-height: 40px;
+    max-height: 40px;
+
+    span {
+        display: inline-block;
+        min-width: 8em;
+    }
+}
