@@ -8,7 +8,6 @@ import {
 
 export function* getChartDataSaga(data) {
   try {
-    console.log(data)
     const response = yield call(dataAPI.getChartData, data.payload);
     yield put(getDataResponse(response.data));
   } catch (err) {
