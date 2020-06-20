@@ -11,7 +11,7 @@ export function* getColumnsSaga() {
     const response = yield call(columnsAPI.getColumns);
     yield put(getColumnsResponse(response.data));
   } catch (err) {
-    yield put(getColumnsError(err.data));
+    yield put(getColumnsError(err.response.data));
   }
 }
 

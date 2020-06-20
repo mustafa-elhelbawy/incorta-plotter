@@ -30,7 +30,8 @@ export default class LineChart extends React.Component {
               {
                 ticks: {
                   min: 0
-                }
+                },
+                stacked: false
               }
             ]
           }
